@@ -1,55 +1,48 @@
-import React from "react";
-import { Editor } from "@tinymce/tinymce-react";
+import  { useRef, useMemo } from "react";
 import { Controller } from "react-hook-form";
-import conf from "../conf/conf.js";
+import JoditEditor from "jodit-react";
 
-export default function RTE({ name, control, label, defaultValue = "" }) {
-  return (
-    <div className="w-full">
-      {label && <label className="inline-block mb-1 pl-1">{label}</label>}
 
-      <Controller
-        name={name || "content"}
-        control={control}
-        render={({ field: { onChange } }) => (
-          <Editor
-            initialValue={defaultValue}
-            apiKey={conf.TinyMCE_APIKey}
-            init={{
-              initialValue: defaultValue,
-              height: 500,
-              menubar: true,
-              plugins: [
-                "image",
-                "advlist",
-                "autolink",
-                "lists",
-                "link",
-                "image",
-                "charmap",
-                "preview",
-                "anchor",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "insertdatetime",
-                "media",
-                "table",
-                "code",
-                "help",
-                "wordcount",
-                "anchor",
-              ],
-              toolbar:
-                "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
-              content_style:
-                "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-            }}
-            onEditorChange={onChange}
-          />
-        )}
-      />
-    </div>
-  );
-}
+
+const RTE = ({
+    name,
+    control,
+    label,
+    placeholder,
+    className = "text-black",
+}) => {
+    const editor = useRef(null);
+
+    const config = useMemo(
+        () => ({
+            readonly: false,
+            placeholder: placeholder || "Start typing...",
+            height: "600px",
+            
+        }),
+        [placeholder]
+    );
+
+    return (
+        <div className={`${className} w-full`}>
+            {label && <label className="inline-block mb-1 pl-1">{label}</label>}
+            <Controller
+                className="min-h-96"           
+                name={name}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <JoditEditor
+                        ref={editor}
+                        value={value || ""}
+                        config={config}
+                        tabIndex={1}
+                        onBlur={(newContent) => onChange(newContent)}
+                        onChange={(newContent) => onChange(newContent)}
+                    />
+                )}
+            />
+        </div>
+    );
+};
+
+export default RTE;
